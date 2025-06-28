@@ -1,32 +1,28 @@
-# Step 1: Import Libraries
+
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 
-# Step 2: Load Dataset (assumes you have already loaded or mounted the dataset)
-# Replace with your path if needed
+
 books = pd.read_csv('/content/Books.csv', encoding='latin-1')
 ratings = pd.read_csv('/content/Ratings.csv', encoding='latin-1')
 users = pd.read_csv('/content/Users.csv', encoding='latin-1')
 
-# Step 3: Merge data
+
 ratings_with_books = ratings.merge(books, on='ISBN')
 
-# Step 4: Filter active users and popular books
 user_counts = ratings_with_books['User-ID'].value_counts()
 ratings_filtered = ratings_with_books[ratings_with_books['User-ID'].isin(user_counts[user_counts >= 200].index)]
 
 book_counts = ratings_filtered['Book-Title'].value_counts()
-ratings_filtered = ratings_filtered[ratings_filtered['Book-Title'].isin(book_counts[book_counts >= 100].index)]
 
-# Step 5: Create pivot table (books x users)
 book_user_matrix = ratings_filtered.pivot_table(index='Book-Title', columns='User-ID', values='Book-Rating')
 book_user_matrix.fillna(0, inplace=True)
 
-# Step 6: Train KNN model
+
 model = NearestNeighbors(metric='cosine', algorithm='brute')
 model.fit(book_user_matrix.values)
 
-# Step 7: Define get_recommends() function
+
 def get_recommends(book="The Queen of the Damned (Vampire Chronicles (Paperback))"):
     if book not in book_user_matrix.index:
         return [book, []]
@@ -40,11 +36,11 @@ def get_recommends(book="The Queen of the Damned (Vampire Chronicles (Paperback)
 
     return [book, recommended]
 
-# Step 8: Test the function
+
 book_name = "The Queen of the Damned (Vampire Chronicles (Paperback))"
 recommended_books = get_recommends(book_name)
 
-# Step 9: Display results
+
 print("Input Book:", recommended_books[0])
 print("Recommended Books:")
 for rec in recommended_books[1]:
