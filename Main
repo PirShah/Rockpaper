@@ -1,0 +1,18 @@
+def player(prev_play, opponent_history=[]):
+    if prev_play:
+        opponent_history.append(prev_play)
+
+    if not opponent_history:
+        return "R"
+
+    # Count opponent moves
+    freq = {"R": 0, "P": 0, "S": 0}
+    for move in opponent_history:
+        freq[move] += 1
+
+    # Predict the opponent's most frequent move
+    predicted = max(freq, key=freq.get)
+
+    # Choose move to beat predicted
+    beats = {"R": "P", "P": "S", "S": "R"}
+    return beats[predicted]
